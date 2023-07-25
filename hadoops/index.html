@@ -1,0 +1,279 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>3个阿里云ECS搭建Hadoop完全分布式集群 | Hi, Dai</title><meta name="keywords" content="hadoop,大数据"><meta name="author" content="Dai Sine"><meta name="copyright" content="Dai Sine"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1. 准备阿里云ECS 我使用的是Mac OS X 10.13，在终端中可以进行： ssh连接远程服务器， scp上传&#x2F;下载远程服务器文件   云服务器ECS * 3  共享基本型  - 1vCPU  - 1Gib PS：3个ECS需要在同一个地域，如华东1。因为不同地域的实例之间内网互不相通。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3个阿里云ECS搭建Hadoop完全分布式集群">
+<meta property="og:url" content="https://daisine.github.io/hadoops/index.html">
+<meta property="og:site_name" content="Hi, Dai">
+<meta property="og:description" content="1. 准备阿里云ECS 我使用的是Mac OS X 10.13，在终端中可以进行： ssh连接远程服务器， scp上传&#x2F;下载远程服务器文件   云服务器ECS * 3  共享基本型  - 1vCPU  - 1Gib PS：3个ECS需要在同一个地域，如华东1。因为不同地域的实例之间内网互不相通。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://daisine.github.io/img/mai9.ico">
+<meta property="article:published_time" content="2019-06-26T01:47:56.000Z">
+<meta property="article:modified_time" content="2019-07-04T07:15:30.941Z">
+<meta property="article:author" content="Dai Sine">
+<meta property="article:tag" content="hadoop">
+<meta property="article:tag" content="大数据">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://daisine.github.io/img/mai9.ico"><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://daisine.github.io/hadoops/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-117497526-4"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-117497526-4');
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '3个阿里云ECS搭建Hadoop完全分布式集群',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2019-07-04 15:15:30'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/mai9.ico')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Hi, Dai</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">3个阿里云ECS搭建Hadoop完全分布式集群</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2019-06-26T01:47:56.000Z" title="Created 2019-06-26 09:47:56">2019-06-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2019-07-04T07:15:30.941Z" title="Updated 2019-07-04 15:15:30">2019-07-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">大数据分析</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="3个阿里云ECS搭建Hadoop完全分布式集群"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="1-准备阿里云ECS"><a href="#1-准备阿里云ECS" class="headerlink" title="1. 准备阿里云ECS"></a>1. 准备阿里云ECS</h2><ul>
+<li>我使用的是Mac OS X 10.13，在终端中可以进行：<ul>
+<li><code>ssh</code>连接远程服务器，</li>
+<li><code>scp</code>上传/下载远程服务器文件</li>
+</ul>
+</li>
+<li>云服务器ECS * 3  <code>共享基本型</code>  - <code>1vCPU</code>  - <code>1Gib</code></li>
+<li>PS：3个ECS需要在同一个地域，如<code>华东1</code>。因为<strong>不同地域</strong>的实例之间<strong>内网互不相通</strong>。</li>
+</ul>
+<span id="more"></span>
+
+<ul>
+<li><p>操作系统：CentOS 7.3 <code>64位</code></p>
+</li>
+<li><p>分配公网IPv4地址：理论上只需要1个ECS分配公网IP即可，3个ECS使用内网互通。<code>之后需要进行设置内网互通，免费</code></p>
+<blockquote>
+<p>如果是3个不同账号/跨地域的ECS，也可以搭建</p>
+</blockquote>
+</li>
+<li><p>ESC设置内网互通，参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/65861.html?spm=a2c4g.11186623.6.558.491f303e3Lb1M5">阿里云帮助-同账号同地域VPC和VBR互通</a></p>
+</li>
+</ul>
+<img src="ecs.png" width="80%">
+
+<h2 id="2-SSH免密码登录"><a href="#2-SSH免密码登录" class="headerlink" title="2. SSH免密码登录"></a>2. SSH免密码登录</h2><ul>
+<li><p>关闭防火墙        <code>3个ECS</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">关闭防火墙</span></span><br><span class="line">systemctl stop firewalld.service</span><br><span class="line"><span class="meta">#</span><span class="bash">开机禁止启动</span></span><br><span class="line">systemctl disable firewalld.service		</span><br><span class="line">firewall-cmd --state</span><br></pre></td></tr></table></figure></li>
+<li><p>修改主机名称：此处我将3个ECS的主机名分别修改为<code>hadoop01</code>，<code>hadoop02</code>，<code>hadoop03</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">将该文件中的内容修改为新的主机名</span></span><br><span class="line">sudo vim /etc/hostname</span><br><span class="line"><span class="meta">#</span><span class="bash">重启服务器生效</span></span><br><span class="line">reboot</span><br></pre></td></tr></table></figure></li>
+<li><p>配置主机映射：由于内网互通，所以均填写的为ecs的内网IP。</p>
+<blockquote>
+<p>如果内网不互通，则自己主机的IP填写为内网IP，其他主机的IP填写为公网IP。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">在该文件内加入新的主机映射 内网ip 主机名</span></span><br><span class="line">vi /etc/hosts 												</span><br><span class="line">172.16.119.x hadoop01</span><br><span class="line">172.16.119.y hadoop02</span><br><span class="line">172.16.238.z hadoop03</span><br></pre></td></tr></table></figure></li>
+<li><p>此时，<code>ECS</code> 之间ping对方的内网IP可以ping通。</p>
+<blockquote>
+<p>事实上我设置了阿里云的ECS内网互通之后就可以ping通内网IP了。</p>
+</blockquote>
+</li>
+<li><p>SSH免密码登录设置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen 					 #回车完成操作</span><br><span class="line">ssh-copy-id hadoop01 #拷贝公钥到需要免密码登录的目标服务器上</span><br><span class="line">ssh-copy-id hadoop02</span><br><span class="line">ssh-copy-id hadoop03</span><br><span class="line">ssh hadoop0x				 #使用`ssh 主机名`免密码登录目标服务器</span><br></pre></td></tr></table></figure></li>
+<li><p>~/.ssh/下的文件功能</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cd ~/.ssh</span><br><span class="line">ls</span><br><span class="line">authorized_keys  id_rsa  id_rsa.pub  known_hosts	</span><br><span class="line"><span class="meta">#</span><span class="bash">~/.ssh的4个文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> known_hosts	：记录ssh访问过计算机的公钥(public key)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> id_rsa	：生成的私钥</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> id_rsa.pub	：生成的公钥</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> authorized_keys	：存放授权过得无秘登录服务器公钥</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="3-安装JDK与Hadoop"><a href="#3-安装JDK与Hadoop" class="headerlink" title="3. 安装JDK与Hadoop"></a>3. 安装JDK与Hadoop</h2><ul>
+<li><p>在root用户下的<code>opt</code>文件夹中创建<code>module</code>、<code>software</code>文件夹</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /opt</span><br><span class="line">mkdir module #安装的JDK与Hadoop的位置</span><br><span class="line">mkdir software #安装包的存储位置</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>way1</strong>：将本地的JDK和Hadoop安装包上传到服务器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">在mac os的本地用户的终端下使用scp上传安装包</span></span><br><span class="line"><span class="meta">#</span><span class="bash">scp 本地安装包路径 root@公网ip:存放文件夹路径</span></span><br><span class="line">scp /users/yi/Downloads/jdk-8u131-linux-x64.tar.gz root@123.56.135.146:/opt/software</span><br><span class="line">scp /users/yi/Downloads/hadoop-2.7.2.tar.gz root@123.56.135.146:/opt/software</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>way2</strong>:在ECS用户下使用wget下载安装包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">wget 下载链接</span></span><br><span class="line"><span class="meta">#</span><span class="bash">我使用的是Hadoop2.7.2 与 Java 1.8.0_131</span></span><br><span class="line"><span class="meta">#</span><span class="bash">Hadoop2.x 与 Hadoop3.x 有区别</span></span><br><span class="line">cd /opt/software #下载的安装包的存放位置</span><br><span class="line">wget JDK‘s URL</span><br><span class="line">wget Hadoop‘s URL</span><br></pre></td></tr></table></figure></li>
+<li><p>在<code>/opt/module</code>安装Hadoop与JDK</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd /opt/software #安装包的位置</span><br><span class="line"><span class="meta">#</span><span class="bash"> tar -zxvf 压缩包名称 -C 解压文件存放位置</span></span><br><span class="line">tar -zxvf jdk-8u131-linux-x64.tar.gz -C /opt/module/</span><br><span class="line">tar -zxvf hadoop-2.7.2.tar.gz -C /opt/module/</span><br></pre></td></tr></table></figure></li>
+<li><p>配置hadoop中的hadoop-env.sh</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd /opt/module/hadoop-2.7.2/etc/hadoop</span><br><span class="line">vi hadoop-env.sh</span><br><span class="line"><span class="meta">#</span><span class="bash">修改JAVA_HOME的值为/opt/module/jdk1.8.0_131</span></span><br><span class="line">export JAVA_HOME=/opt/module/jdk1.8.0_131</span><br></pre></td></tr></table></figure></li>
+<li><p>配置Hadoop与JDK的环境变量</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/profile #在profile中加入以下环境变量</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#JAVA_HOME</span></span></span><br><span class="line">export JAVA_HOME=/opt/module/jdk1.8.0_131</span><br><span class="line">export PATH=$JAVA_HOME/bin:$PATH</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#HADOOP_HOME</span></span></span><br><span class="line">export HADOOP_HOME=/opt/module/hadoop-2.7.2</span><br><span class="line">export PATH=$PATH:$HADOOP_HOME/bin</span><br><span class="line">export PATH=$PATH:$HADOOP_HOME/sbin</span><br><span class="line"></span><br><span class="line">source  /etc/profile #让修改后的profile生效</span><br><span class="line">java -version	#查询Java版本可以正确显示结果</span><br><span class="line">hadoop #显示Hadoop的使用方式</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果不能查询Java版本和Hadoop指令，可以使用<code>reboot</code>重启服务器再进行尝试。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="4-Hadoop完全分布式集群搭建"><a href="#4-Hadoop完全分布式集群搭建" class="headerlink" title="4. Hadoop完全分布式集群搭建"></a>4. Hadoop完全分布式集群搭建</h2><ul>
+<li><p>修改<code>/opt/module/hadoop-2.7.2/etc/hadoop</code>文件夹中的配置文件</p>
+</li>
+<li><p>core-site.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://hadoop01:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 指定hadoop运行时产生文件的存储目录 --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">value</span>&gt;</span>/opt/module/hadoop-2.7.2/data/tmp<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>hdfs-site.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>3<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.namenode.secondary.http-address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>hadoop03:50090<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>slaves</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">删掉了localhost，加入以下内容</span></span><br><span class="line">hadoop01</span><br><span class="line">hadoop02</span><br><span class="line">hadoop03</span><br></pre></td></tr></table></figure></li>
+<li><p>yarn-env.sh</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 修改JAVA_HOME的值并取消注释<span class="comment">#</span></span></span><br><span class="line">export JAVA_HOME=/opt/module/jdk1.8.0_131</span><br></pre></td></tr></table></figure></li>
+<li><p>yarn-site.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- reducer获取数据的方式 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>mapreduce_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 指定YARN的ResourceManager的地址 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.hostname<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>hadoop02<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>mapred-env.sh</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 修改JAVA_HOME的值并取消注释<span class="comment">#</span></span></span><br><span class="line">export JAVA_HOME=/opt/module/jdk1.8.0_131</span><br></pre></td></tr></table></figure></li>
+<li><p>mapred-site.xml(原本不存在这个文件)</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 指定mr运行在yarn上 --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.framework.name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">value</span>&gt;</span>yarn<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>分发以上修改的文件到另外2个ECS</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scp -r /opt/module/hadoop-2.7.2/etc/hadoop hadoop02:/opt/module/hadoop-2.7.2/etc/</span><br><span class="line">scp -r /opt/module/hadoop-2.7.2/etc/hadoop hadoop03:/opt/module/hadoop-2.7.2/etc/</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="5-Hadoop集群启动"><a href="#5-Hadoop集群启动" class="headerlink" title="5. Hadoop集群启动"></a>5. Hadoop集群启动</h2><ul>
+<li><p>首次启动集群，需要格式化namenode</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/hdfs namenode -format</span><br></pre></td></tr></table></figure></li>
+<li><p>在Hadoop01中启动HDFS</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sbin/start-dfs.sh</span><br></pre></td></tr></table></figure></li>
+<li><p>使用<code>jps</code>查看Hadoop进程</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@hadoop01 hadoop-2.7.2]# jps</span><br><span class="line">6649 Jps</span><br><span class="line">6316 NameNode</span><br><span class="line">6446 DataNode</span><br><span class="line">[root@hadoop01 hadoop-2.7.2]# ssh hadoop02</span><br><span class="line">[root@hadoop02 ~]# jps</span><br><span class="line">14206 Jps</span><br><span class="line">14111 DataNode</span><br><span class="line">[root@hadoop02 ~]# ssh hadoop 03</span><br><span class="line">[root@hadoop03 ~]# jps</span><br><span class="line">5091 DataNode</span><br><span class="line">5192 SecondaryNameNode</span><br><span class="line">5260 Jps</span><br></pre></td></tr></table></figure></li>
+<li><p>在阿里云ECS控制台中将Hadoop01服务器的<code>安全组规则</code>中开放50070端口</p>
+<blockquote>
+<p>50070为hadoop2.x中namenode的默认web访问端口</p>
+</blockquote>
+</li>
+<li><p>在HDFS启动的时候，访问<code>http://hadoop01&#39;s公网IP:50070</code></p>
+</li>
+</ul>
+<img src="h1.png" width="100%">
+
+<img src="h2.png" width="100%">
+
+<ul>
+<li><p>启动与关闭HDFS</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sbin/start-dfs.sh</span><br><span class="line">sbin/stop-dfs.sh</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ul>
+<li><p>启动与关闭yarn</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sbin/start-yarn.sh</span><br><span class="line">sbin/stop-yarn.sh</span><br></pre></td></tr></table></figure></li>
+<li><p>全部启动与关闭</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">start-all.sh</span><br><span class="line">stop-all.sh</span><br></pre></td></tr></table></figure></li>
+<li><p>上传文件到集群</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">创建上传的文件所在目录</span></span><br><span class="line">bin/hdfs dfs -mkdir -p /user/root/tmp/conf</span><br><span class="line"><span class="meta">#</span><span class="bash">上传文件到HDFS</span></span><br><span class="line">bin/hdfs dfs -put etc/hadoop/*-site.xml /user/root/tmp/conf</span><br><span class="line"><span class="meta">#</span><span class="bash">下载HDFS中的文件</span></span><br><span class="line">bin/hadoop fs -get /user/root/input/workcount.txt</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="6-使用eclipse远程连接hadoop集群"><a href="#6-使用eclipse远程连接hadoop集群" class="headerlink" title="6. 使用eclipse远程连接hadoop集群"></a>6. 使用eclipse远程连接hadoop集群</h2><ul>
+<li><p>本地安装eclipse与Java环境(JDK版本不需要与服务器一致)</p>
+</li>
+<li><p>下载<code>hadoop-eclipse-plugin-2.7.3.jar</code>(没找到2.7.2版本的，2.7.3能用)</p>
+</li>
+<li><p>将<code>hadoop-eclipse-plugin-2.7.3.jar</code>放在eclipse - contents - eclipse - plugins文件夹中</p>
+</li>
+<li><p>打开<code>eclipse</code> 添加插件 - Map</p>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Dai Sine</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://daisine.github.io/hadoops/">https://daisine.github.io/hadoops/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/hadoop/">hadoop</a><a class="post-meta__tags" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></div><div class="post_share"><div class="social-share" data-image="/img/mai9.ico" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/dockerhadoop/"><img class="prev-cover" src="/img/mai5.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">Ubuntu下Docker搭建Hadoop完全分布式集群</div></div></a></div><div class="next-post pull-right"><a href="/diptimu/"><img class="next-cover" src="/img/mai4.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">数字图像处理习题</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/dockerhadoop/" title="Ubuntu下Docker搭建Hadoop完全分布式集群"><img class="cover" src="/img/mai5.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-07-02</div><div class="title">Ubuntu下Docker搭建Hadoop完全分布式集群</div></div></a></div><div><a href="/hive/" title="Hadoop安装hive&配置mysql元数据库"><img class="cover" src="/img/mai11.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-07-02</div><div class="title">Hadoop安装hive&配置mysql元数据库</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Dai Sine</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/daisine" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:daisine@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%87%86%E5%A4%87%E9%98%BF%E9%87%8C%E4%BA%91ECS"><span class="toc-number">1.</span> <span class="toc-text">1. 准备阿里云ECS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-SSH%E5%85%8D%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95"><span class="toc-number">2.</span> <span class="toc-text">2. SSH免密码登录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%AE%89%E8%A3%85JDK%E4%B8%8EHadoop"><span class="toc-number">3.</span> <span class="toc-text">3. 安装JDK与Hadoop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Hadoop%E5%AE%8C%E5%85%A8%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA"><span class="toc-number">4.</span> <span class="toc-text">4. Hadoop完全分布式集群搭建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Hadoop%E9%9B%86%E7%BE%A4%E5%90%AF%E5%8A%A8"><span class="toc-number">5.</span> <span class="toc-text">5. Hadoop集群启动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E4%BD%BF%E7%94%A8eclipse%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5hadoop%E9%9B%86%E7%BE%A4"><span class="toc-number">6.</span> <span class="toc-text">6. 使用eclipse远程连接hadoop集群</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/mysql/" title="软件设计编写中mysql related"><img src="/img/mai8.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="软件设计编写中mysql related"/></a><div class="content"><a class="title" href="/mysql/" title="软件设计编写中mysql related">软件设计编写中mysql related</a><time datetime="2022-08-15T07:31:21.000Z" title="Created 2022-08-15 15:31:21">2022-08-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-ide/" title="QtCreator/VS2015/Clion配置"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="QtCreator/VS2015/Clion配置"/></a><div class="content"><a class="title" href="/qt-ide/" title="QtCreator/VS2015/Clion配置">QtCreator/VS2015/Clion配置</a><time datetime="2022-07-08T08:32:22.000Z" title="Created 2022-07-08 16:32:22">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-class/" title="Qt开发笔记"><img src="/img/mai4.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt开发笔记"/></a><div class="content"><a class="title" href="/qt-class/" title="Qt开发笔记">Qt开发笔记</a><time datetime="2022-07-08T01:45:12.000Z" title="Created 2022-07-08 09:45:12">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/mac-ntfs/" title="Mac 读写ntfs U盘"><img src="/img/mai5.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Mac 读写ntfs U盘"/></a><div class="content"><a class="title" href="/mac-ntfs/" title="Mac 读写ntfs U盘">Mac 读写ntfs U盘</a><time datetime="2022-07-05T08:20:28.000Z" title="Created 2022-07-05 16:20:28">2022-07-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-msvc-clion/qt-msvc-clion/" title="No title"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="No title"/></a><div class="content"><a class="title" href="/qt-msvc-clion/qt-msvc-clion/" title="No title">No title</a><time datetime="2022-06-21T07:20:07.233Z" title="Created 2022-06-21 15:20:07">2022-06-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2017 - 2023 By Dai Sine</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

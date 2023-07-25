@@ -1,0 +1,251 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>操作系统笔记06 CPU调度 | Hi, Dai</title><meta name="keywords" content="note"><meta name="author" content="Dai Sine"><meta name="copyright" content="Dai Sine"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="基本概念 CPU调度是多道程序操作系统的基础。通过在进程之间切换CPU，操作系统可以提高计算机的吞吐率。 在内核级支持线程的操作系统中，是线程被操作系统调度，而不是进程。 调度是操作系统的基本功能。 几乎所有的计算机资源在使用前都要调度。 CPU调度对操作系统设计来说很重要。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统笔记06 CPU调度">
+<meta property="og:url" content="https://daisine.github.io/os6/index.html">
+<meta property="og:site_name" content="Hi, Dai">
+<meta property="og:description" content="基本概念 CPU调度是多道程序操作系统的基础。通过在进程之间切换CPU，操作系统可以提高计算机的吞吐率。 在内核级支持线程的操作系统中，是线程被操作系统调度，而不是进程。 调度是操作系统的基本功能。 几乎所有的计算机资源在使用前都要调度。 CPU调度对操作系统设计来说很重要。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://daisine.github.io/img/mai8.ico">
+<meta property="article:published_time" content="2018-07-03T06:16:50.000Z">
+<meta property="article:modified_time" content="2020-01-02T07:38:42.065Z">
+<meta property="article:author" content="Dai Sine">
+<meta property="article:tag" content="note">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://daisine.github.io/img/mai8.ico"><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://daisine.github.io/os6/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-117497526-4"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-117497526-4');
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '操作系统笔记06 CPU调度',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-01-02 15:38:42'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/mai8.ico')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Hi, Dai</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">操作系统笔记06 CPU调度</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2018-07-03T06:16:50.000Z" title="Created 2018-07-03 14:16:50">2018-07-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2020-01-02T07:38:42.065Z" title="Updated 2020-01-02 15:38:42">2020-01-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="操作系统笔记06 CPU调度"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h4 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h4><ul>
+<li>CPU调度是多道程序操作系统的基础。通过在进程之间切换CPU，操作系统可以提高计算机的<strong>吞吐率</strong>。</li>
+<li>在内核级支持线程的操作系统中，是线程被操作系统调度，而不是进程。</li>
+<li>调度是操作系统的基本功能。 几乎所有的计算机资源在使用前都要调度。 CPU调度对操作系统设计来说很重要。</li>
+</ul>
+ <span id="more"></span>
+
+<h5 id="CPU-I-O-区间周期"><a href="#CPU-I-O-区间周期" class="headerlink" title="CPU- I/O 区间周期"></a>CPU- I/O 区间周期</h5><ul>
+<li>CPU的成功调度依赖于进程的如下属性：</li>
+<li>进程执行由<strong>CPU执行</strong>和 <strong>I/O 等待周期</strong>组成</li>
+<li>进程在这两个状态之间切换。</li>
+<li>由CPU区间开始- I/O 区间 -..-最后的CPU区间通过系统请求终止执行。</li>
+<li>CPU区间时间曲线图：通常为指数/超指数形式，具有大量短CPU区间和少量长CPU区间。  <img src="0.png" width="35%" height="80%" /> 
+<img src="1.png" width="55%" height="80%" /> </li>
+</ul>
+<h5 id="CPU调度程序"><a href="#CPU调度程序" class="headerlink" title="CPU调度程序"></a>CPU调度程序</h5><ul>
+<li>每当CPU空闲时，操作系统就必须从就绪队列中选择一个进程来执行。晋城选择由<strong>短期调度程序</strong>或CPU调度程序来执行。</li>
+<li>CPU调度决策可在如下4种情况下发生：</li>
+</ul>
+<ol>
+<li>当一个进程从运行切换到等待状态。</li>
+<li>当一个进程从运行状态切换到就绪状态。</li>
+<li>当一个进程从等待切换到就绪状态。</li>
+<li>当一个进程终止。</li>
+</ol>
+<ul>
+<li>当调度只能发生1和4两种情况下，称调度方案是<strong>非抢占的/协作</strong>的，否则，称调度方案是<strong>抢占的</strong>。</li>
+<li>抢占调度：对访问共享数据是有代价的，对操作系统内核的设计也有影响。</li>
+</ul>
+<h4 id="调度标准"><a href="#调度标准" class="headerlink" title="调度标准"></a>调度标准</h4><ul>
+<li>CPU使用率：使CPU尽可能忙。</li>
+<li>吞吐量：一个时间单元内所完成的进程的数量。</li>
+<li>周转时间：从进程提交到进程完成的时间段。</li>
+<li>等待时间：进程在就绪队列中等待的时间量。</li>
+<li>响应时间：从提交请求到产生第一个响应所花费的时间量。</li>
+</ul>
+<h4 id="调度算法"><a href="#调度算法" class="headerlink" title="调度算法"></a>调度算法</h4><h5 id="先到先服调度-FCFS"><a href="#先到先服调度-FCFS" class="headerlink" title="先到先服调度(FCFS)"></a>先到先服调度(FCFS)</h5><ul>
+<li>先请求CPU的进程先分配CPU</li>
+<li>非抢占：一旦CPU被分配给了一个进程，该进程就会保持CPU直到释放CPU位置。  </li>
+<li>1 - 2 - 3进程等待时间: P1 = 0; P2 = 24; P3 = 27; 平均等待时间: (0 + 24 + 27) / 3 = 17 </li>
+<li>2 - 3 - 1进程等待时间: P1 = 6; P2 = 0; P3 = 3; 平均等待时间: (6 + 0 + 3) / 3 = 3 <img src="2.png" width="35%" height="80%" />   
+<img src="3.png" width="49%" height="80%" />
+<img src="4.png" width="49%" height="80%" /></li>
+</ul>
+<h5 id="最短作业优先调度-SJF"><a href="#最短作业优先调度-SJF" class="headerlink" title="最短作业优先调度(SJF)"></a>最短作业优先调度(SJF)</h5><ul>
+<li>将每个进程与其下一个CPU区间段相关联。当CPU为空闲时，它会赋给具有最短CPU区间的进程。</li>
+<li>SJF调度算法可证明为最佳，对给定的一组进程，平均等待时间最短。</li>
+<li>具有理论价值，无法实现，因为没有办法知道下一个CPU区间的长度。</li>
+<li>两种方案：</li>
+<li>非抢占：一旦CPU给予该进程，它就不可能被抢占。eg. 平均等待时间: (0 + 6 + 3 + 7)/4 = 4.</li>
+<li>抢占：如果一个到达的新的进程CPU区间长度小于当前执行进程的剩余时间，则抢占。也被称为最短剩余时间优先（SRTF）调度。eg. 平均等待时间: (9 + 1 + 0 + 2)/4 = 3.   </li>
+</ul>
+<p><img src="5.png" width="25%" height="80%" />   <img src="6.png" width="35%" height="80%" /><img src="7.png" width="35%" height="80%" /></p>
+<h5 id="优先级调度"><a href="#优先级调度" class="headerlink" title="优先级调度"></a>优先级调度</h5><ul>
+<li>每一个进程都有一个优先级与其关联。具有最高优先级的进程会分配到CPU。</li>
+<li>优先级通常为固定区间的数字。此处用小数字表示高优先级。</li>
+<li>SJF算法是优先级调度的一个特例，其优先级为下一个CPU区间的倒数。CPU区间越大，优先级越小。</li>
+<li>优先级调度可以是抢占或非抢占的<br><img src="8.png" width="35%" height="80%" /><img src="9.png" width="50%" height="80%" /></li>
+<li>存在的问题</li>
+</ul>
+<ol>
+<li>饥饿/无穷阻塞：低优先级进程可能永远不会执行。</li>
+<li>优先级反转：高优先级进程需要访问资源，被另一个优先级较低的进程持有，该低优先级进程不运行则不释放资源。</li>
+</ol>
+<ul>
+<li>解决办法</li>
+<li>老化：逐渐增加在系统中等待很长时间的进程的优先级。</li>
+</ul>
+<h5 id="轮转法调度-RR"><a href="#轮转法调度-RR" class="headerlink" title="轮转法调度(RR)"></a>轮转法调度(RR)</h5><ul>
+<li>轮转法调度算法专门为分时系统设计。类似FCFS调度，但增加了抢占以切换进程。</li>
+<li>定义一个较小时间单元，称为<strong>时间片</strong>，通常为10-100ms。</li>
+<li>将就绪队列作为循环队列。CPU调度程序循环就绪队列，为每个进程分配不超过一个时间片的CPU。</li>
+</ul>
+<ol>
+<li>进程只需要小于时间片的CPU区间，释放CPU，继续就绪队列的下一个进程。</li>
+<li>进程的CPU区间比时间片长，经过这段时间片的CPU区间，进程被抢占并加入到就绪队列的末尾。</li>
+</ol>
+<ul>
+<li>如果在就绪队列中有n个进程并且时间量为q，那么每个进程会得到 1 / n 的CPU时间，其长度不超过q时间单元。每个进程必须等到的CPU时间不超过 ( n - 1 ) q 个时间单元，直到它的下一个时间片为止。</li>
+<li>性能很大程度上依赖于时间片的大小</li>
+<li>时间片非常大 ➡ FCFS</li>
+<li>时间片很小 ➡ 时间片要比上下文切换时间长，否则开销太高。</li>
+</ul>
+<h5 id="多级队列调度"><a href="#多级队列调度" class="headerlink" title="多级队列调度"></a>多级队列调度</h5><ul>
+<li>就绪队列被分成多个独立队列。</li>
+<li>根据进程的属性，如内存大小、进程优先级、进程类型etc，一个进程被永久地分配到一个队列。</li>
+<li>每个队列有自己的调度算法</li>
+<li>eg. 前台队列（用于交互式进程）使用RR算法调度，后台队列（用于批处理）使用FCFS算法调度。  <img src="10.png" width="40%" height="80%" /></li>
+</ul>
+<h5 id="多级反馈队列调度"><a href="#多级反馈队列调度" class="headerlink" title="多级反馈队列调度"></a>多级反馈队列调度</h5><ul>
+<li>一个进程可以在各个队列之间移动。</li>
+<li>eg. 如果进程使用过多CPU时间，那么它就被转移到更低优先级队列。<img src="11.png" width="40%" height="80%" /></li>
+</ul>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><ul>
+<li>在实践中正确实施比在原则上正确实施要困难得多。因此，调度程序很少做出最佳选择。</li>
+<li>解决方案：<strong>调度策略和调度机制的分离</strong>。也就是说，调度算法以某种方式被参数化，但参数可以由用户填写。</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Dai Sine</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://daisine.github.io/os6/">https://daisine.github.io/os6/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/note/">note</a></div><div class="post_share"><div class="social-share" data-image="/img/mai8.ico" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/os7/"><img class="prev-cover" src="/img/mai6.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">操作系统笔记07 进程同步</div></div></a></div><div class="next-post pull-right"><a href="/os5/"><img class="next-cover" src="/img/mai2.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">操作系统笔记05 线程管理</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/CG/" title="计算机图形学笔记及练习"><img class="cover" src="/img/mai11.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-12-21</div><div class="title">计算机图形学笔记及练习</div></div></a></div><div><a href="/Cryptography/" title="密码学笔记"><img class="cover" src="/img/mai8.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-12-01</div><div class="title">密码学笔记</div></div></a></div><div><a href="/cky/" title="C语言-考研专业课笔记"><img class="cover" src="/img/mai8.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-02</div><div class="title">C语言-考研专业课笔记</div></div></a></div><div><a href="/cn1/" title="计算机网络笔记01 计算机网络和因特网"><img class="cover" src="/img/mai5.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-06-08</div><div class="title">计算机网络笔记01 计算机网络和因特网</div></div></a></div><div><a href="/cn2/" title="计算机网络笔记02 应用层"><img class="cover" src="/img/mai6.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-06-08</div><div class="title">计算机网络笔记02 应用层</div></div></a></div><div><a href="/cn3/" title="计算机网络笔记03 运输层"><img class="cover" src="/img/mai4.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-06-08</div><div class="title">计算机网络笔记03 运输层</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Dai Sine</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/daisine" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:daisine@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.</span> <span class="toc-text">基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#CPU-I-O-%E5%8C%BA%E9%97%B4%E5%91%A8%E6%9C%9F"><span class="toc-number">1.1.</span> <span class="toc-text">CPU- I&#x2F;O 区间周期</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#CPU%E8%B0%83%E5%BA%A6%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.2.</span> <span class="toc-text">CPU调度程序</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E6%A0%87%E5%87%86"><span class="toc-number">2.</span> <span class="toc-text">调度标准</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">调度算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%88%E5%88%B0%E5%85%88%E6%9C%8D%E8%B0%83%E5%BA%A6-FCFS"><span class="toc-number">3.1.</span> <span class="toc-text">先到先服调度(FCFS)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9C%80%E7%9F%AD%E4%BD%9C%E4%B8%9A%E4%BC%98%E5%85%88%E8%B0%83%E5%BA%A6-SJF"><span class="toc-number">3.2.</span> <span class="toc-text">最短作业优先调度(SJF)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BC%98%E5%85%88%E7%BA%A7%E8%B0%83%E5%BA%A6"><span class="toc-number">3.3.</span> <span class="toc-text">优先级调度</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BD%AE%E8%BD%AC%E6%B3%95%E8%B0%83%E5%BA%A6-RR"><span class="toc-number">3.4.</span> <span class="toc-text">轮转法调度(RR)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%9A%E7%BA%A7%E9%98%9F%E5%88%97%E8%B0%83%E5%BA%A6"><span class="toc-number">3.5.</span> <span class="toc-text">多级队列调度</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%9A%E7%BA%A7%E5%8F%8D%E9%A6%88%E9%98%9F%E5%88%97%E8%B0%83%E5%BA%A6"><span class="toc-number">3.6.</span> <span class="toc-text">多级反馈队列调度</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">3.7.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/mysql/" title="软件设计编写中mysql related"><img src="/img/mai8.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="软件设计编写中mysql related"/></a><div class="content"><a class="title" href="/mysql/" title="软件设计编写中mysql related">软件设计编写中mysql related</a><time datetime="2022-08-15T07:31:21.000Z" title="Created 2022-08-15 15:31:21">2022-08-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-ide/" title="QtCreator/VS2015/Clion配置"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="QtCreator/VS2015/Clion配置"/></a><div class="content"><a class="title" href="/qt-ide/" title="QtCreator/VS2015/Clion配置">QtCreator/VS2015/Clion配置</a><time datetime="2022-07-08T08:32:22.000Z" title="Created 2022-07-08 16:32:22">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-class/" title="Qt开发笔记"><img src="/img/mai4.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt开发笔记"/></a><div class="content"><a class="title" href="/qt-class/" title="Qt开发笔记">Qt开发笔记</a><time datetime="2022-07-08T01:45:12.000Z" title="Created 2022-07-08 09:45:12">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/mac-ntfs/" title="Mac 读写ntfs U盘"><img src="/img/mai5.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Mac 读写ntfs U盘"/></a><div class="content"><a class="title" href="/mac-ntfs/" title="Mac 读写ntfs U盘">Mac 读写ntfs U盘</a><time datetime="2022-07-05T08:20:28.000Z" title="Created 2022-07-05 16:20:28">2022-07-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-msvc-clion/qt-msvc-clion/" title="No title"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="No title"/></a><div class="content"><a class="title" href="/qt-msvc-clion/qt-msvc-clion/" title="No title">No title</a><time datetime="2022-06-21T07:20:07.233Z" title="Created 2022-06-21 15:20:07">2022-06-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2017 - 2023 By Dai Sine</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

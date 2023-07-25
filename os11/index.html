@@ -1,0 +1,311 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>操作系统笔记11 文件系统 | Hi, Dai</title><meta name="keywords" content="note"><meta name="author" content="Dai Sine"><meta name="copyright" content="Dai Sine"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="文件系统接口(用户角度)文件概念 **文件**是逻辑外存单元的最小分配单元。 类型 数据：数字字符，二进制… 程序 文件结构 无： 一个字节序列 简单的记录结构：①行 ②固定长度 ③可变长度 复杂结构：①格式化文档 ②对象文件 ③可执行文件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统笔记11 文件系统">
+<meta property="og:url" content="https://daisine.github.io/os11/index.html">
+<meta property="og:site_name" content="Hi, Dai">
+<meta property="og:description" content="文件系统接口(用户角度)文件概念 **文件**是逻辑外存单元的最小分配单元。 类型 数据：数字字符，二进制… 程序 文件结构 无： 一个字节序列 简单的记录结构：①行 ②固定长度 ③可变长度 复杂结构：①格式化文档 ②对象文件 ③可执行文件">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://daisine.github.io/img/mai4.ico">
+<meta property="article:published_time" content="2018-07-03T06:19:18.000Z">
+<meta property="article:modified_time" content="2020-01-02T07:45:00.294Z">
+<meta property="article:author" content="Dai Sine">
+<meta property="article:tag" content="note">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://daisine.github.io/img/mai4.ico"><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://daisine.github.io/os11/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-117497526-4"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-117497526-4');
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '操作系统笔记11 文件系统',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-01-02 15:45:00'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/mai4.ico')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Hi, Dai</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">操作系统笔记11 文件系统</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2018-07-03T06:19:18.000Z" title="Created 2018-07-03 14:19:18">2018-07-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2020-01-02T07:45:00.294Z" title="Updated 2020-01-02 15:45:00">2020-01-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="操作系统笔记11 文件系统"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h4 id="文件系统接口-用户角度"><a href="#文件系统接口-用户角度" class="headerlink" title="文件系统接口(用户角度)"></a>文件系统接口(用户角度)</h4><h5 id="文件概念"><a href="#文件概念" class="headerlink" title="文件概念"></a>文件概念</h5><ul>
+<li>**<code>文件</code>**是逻辑外存单元的最小分配单元。</li>
+<li><strong>类型</strong></li>
+<li>数据：数字字符，二进制…</li>
+<li>程序</li>
+<li><strong>文件结构</strong></li>
+<li>无： 一个字节序列</li>
+<li>简单的记录结构：①行 ②固定长度 ③可变长度</li>
+<li>复杂结构：①格式化文档 ②对象文件 ③可执行文件</li>
+</ul>
+ <span id="more"></span>
+<ul>
+<li><strong>谁决定文件结构？</strong></li>
+<li>操作系统：可执行文件和共享库文件的结构</li>
+<li>程序</li>
+<li><strong>文件属性</strong>：所有文件的信息都保存在目录结构中。</li>
+<li>名称：文件符号名称是唯一的、按照人们易读取的形式保存。</li>
+<li>标识符：标示文件系统内文件的唯一标签，通常为人不可读。</li>
+<li>类型：被支持不同类型的文件系统所使用。</li>
+<li>位置：该信息指向设备和设备上文件位置的指针。</li>
+<li>大小：文件当前大小，也可包括文件允许的最大容量值。</li>
+<li>保护：决定谁能读、写、执行等的访问控制信息。</li>
+<li>时间，日期和用户标识：文件创建、上次修改和赏赐访问的相关信息。这些数据用于保护、安全和使用跟踪。</li>
+<li><strong>文件操作</strong></li>
+<li>创建，打开，关闭，读，写，在文件内重定位(搜索目录相应条目)，删除，截短(删除内容保留属性，长度设置为0并释放)。</li>
+<li>打开文件：当一个文件被打开时，除了存储在设备上的信息之外，还会执行几条数据来管理打开的文件<br>①<strong>文件指针</strong>：指向上次读取/写入位置的指针，这种指针对于打开文件的每个进程唯一。<br>②<strong>文件打开计数器</strong>：文件关闭时，操作系统必须重用其打开文件表条目，否则表内空间会不够用。因为多个进程可能打开同一个文件，所以系统在删除打开文件条目之前，必须等待最后一个进程关闭文件。该计数器跟踪打开和关闭的数量，当该计数为0 时，系统关闭文件，删除该条目。<br>③<strong>文件磁盘位置</strong>：绝大多数文件操作都要求系统修改文件数据。该信息保存在内存中以免为每个操作都从磁盘中读取。<br>④<strong>访问权限</strong>：每个进程打开文件都需要有一个访问模式（创建、只读、读写、添加等)。该信息保存在进程的打开文件表中以便操作系统能允许或拒绝之后的 I/O 请求。</li>
+<li><strong>文件类型</strong>    <img src="0.png" width="65%" height="80%" /></li>
+<li><strong>文件访问</strong>：文件访问</li>
+<li>顺序访问：从头开始读取所有字节/记录。不能跳转，但当存储设备是磁带时可以倒带或备份。</li>
+<li>随机访问/直接访问：读/写顺序无限制。字节/记录以任何顺序读取，这种访问对数据库很重要。</li>
+</ul>
+<h5 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h5><ul>
+<li><strong>目录操作</strong>：</li>
+<li>搜索文件</li>
+<li>创建文件</li>
+<li>删除文件</li>
+<li>遍历目录</li>
+<li>重命名文件</li>
+<li>跟踪文件系统</li>
+<li><strong><code>单层目录结构</code></strong></li>
+<li>限制：①文件必须具有唯一名称(命名问题) ②(文件过多)分组问题<img src="1.png" width="55%" height="80%" /></li>
+<li><strong><code>双层目录结构</code></strong></li>
+<li>为每个用户创建<strong>独立目录</strong></li>
+<li>特点：①文件或目录可以按其路径定位 ②不同的用户可以使用相同文件名<img src="2.png" width="55%" height="80%" /></li>
+<li><strong><code>树状目录结构</code></strong></li>
+<li>分组能力</li>
+<li>禁止共享文件或目录</li>
+<li>路径名有两种形式：①绝对路径名 ②相对路径名</li>
+<li>每个进程都有一个当前目录，在启动时分配给它。<img src="3.png" width="55%" height="80%" /></li>
+<li>**<code>无环图目录</code>**：树状结构目录的扩展</li>
+<li>允许目录含有共享子目录和文件。同一文件或子目录可出现在两个不同目录中。</li>
+<li>某些操作系统不支持无环图目录，例如MS-DOS</li>
+<li>UNIX/LINUX和Windows（7+）通过<strong>符号链接</strong>支持它<img src="4.png" width="55%" height="80%" /></li>
+</ul>
+<h5 id="文件系统挂载"><a href="#文件系统挂载" class="headerlink" title="文件系统挂载"></a>文件系统挂载</h5><ul>
+<li>文件系统在被系统上的进程使用之前必须安装/挂载。</li>
+<li>目录结构可以建立在多个卷上。这些卷必须安装以使它们在文件系统命名空间可用。(U盘)</li>
+<li>文件系统的安装位置称为<strong>安装点</strong>，为一个空目录。</li>
+<li>Windows操作系统在引导过程中安装包含FAT（-12，-16，-32）或NTFS文件系统的所有分区，分别是“C：”，“D：”等。</li>
+<li>在UNIX / Linux中，系统管理员必须发出命令来在设备中安装文件系统。<code>mount -t iso9660 / mnt / cdrom / dev / cdrom</code></li>
+</ul>
+<h5 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h5><ul>
+<li>在多用户系统上共享文件是可取的。</li>
+<li>大多数系统通过其唯一的用户标识或UID来识别用户。除了UID，一些系统还实现了组功能</li>
+<li>每个组都分配一个唯一的组标识或GID。每个用户可以在一个或多个组中</li>
+<li>当文件或目录最初创建时，它与用户的UID和GID相关联。拥有文件的用户是该文件的所有者。</li>
+</ul>
+<h5 id="文件保护"><a href="#文件保护" class="headerlink" title="文件保护"></a>文件保护</h5><ul>
+<li>文件所有者应该能够控制可以完成什么以及由谁来完成</li>
+<li>访问类型：读取（R），写入（W），执行（X），添加，删除，列表</li>
+<li>访问控制列表（ACL）指定用户名和每个用户允许的访问类型。</li>
+<li>它用于执行细粒度的文件和目录保护。 ACL的主要问题是它们的长度。</li>
+<li>因此，最常见的方法是将UNIX样式保护与ACL结合使用。</li>
+<li>例如，Windows NT或更高版本以及Solaris 2.6或更高版本使用此组合方法。</li>
+</ul>
+<h4 id="文件系统实现"><a href="#文件系统实现" class="headerlink" title="文件系统实现"></a>文件系统实现</h4><h5 id="文件系统结构"><a href="#文件系统结构" class="headerlink" title="文件系统结构"></a>文件系统结构</h5><ul>
+<li>文件</li>
+<li>逻辑存储单元</li>
+<li>相关信息的集合</li>
+<li>**文件控制块(FCB)**：包含文件的所有信息。在UNIX中，FCB通常称为inode</li>
+<li>文件系统：提供对磁盘的高效且便捷的访问，用以轻松地存储、定位和提取数据。</li>
+<li>在二级存储器中，采用分层结构实现文件系统能够最大限度地减少重复的代码。  <img src="5.png" width="20%" height="80%" /></li>
+<li>一个典型的文件控制块FCB：  <img src="6.png" width="35%" height="80%" /></li>
+</ul>
+<h5 id="虚拟文件系统-VFS"><a href="#虚拟文件系统-VFS" class="headerlink" title="虚拟文件系统(VFS)"></a>虚拟文件系统(VFS)</h5><ul>
+<li>问题：</li>
+<li>操作系统如何把多个文件系统整合成一个目录？</li>
+<li>用户如何在访问文件系统空间时，可以无缝地在文件系统之间移动？</li>
+<li>虚拟文件系统(VFS)：</li>
+<li>大多数操作系统包括UNIX使用面向对象的技术来简化，组织和模块化实现过程。  </li>
+<li>一个通用的文件系统接口与文件系统实现分离，文件系统接口包含“打开”，“关闭”，“读取”，“写入”和“查找”等系统调用。  <img src="7.png" width="50%" height="80%" /></li>
+<li>**<code>VFS接口</code>**有两个重要功能：</li>
+<li>VFS层通过定义一个清晰的VFS接口，以将文件系统的通用操作和具体实现分开。</li>
+<li>VFS提供了在网络上唯一标识一个文件的机制。VFS基于名为<strong>vnode</strong>的文件表示结构，该结构包含一个数值标识符以表示位于整个网络范围的唯一文件。</li>
+</ul>
+<h5 id="目录实现"><a href="#目录实现" class="headerlink" title="目录实现"></a>目录实现</h5><ul>
+<li>一些操作系统（包括UNIX）将目录完全视为文件</li>
+<li>它为每个文件或其子目录保存两条信息：文件/子目录名称和指向文件/子目录的FCB的指针（它们通常被组织成一个C“struct dirent”）</li>
+<li>一个目录可能包含很多文件或子目录，如何组织这些“dirent”？(Unix的一个结构体)</li>
+<li><strong>线性列表</strong>：使用存储文件名和数据快指针的线性列表。</li>
+<li>√ 实现简单</li>
+<li>× 搜索耗时</li>
+<li><strong>哈希表</strong>：线性列表存储结构 + 哈希数据结构</li>
+<li>√ 减少目录搜索时间，插入和删除也很简单。</li>
+<li>× 其通常固定的大小和哈希函数对大小的依赖性。<strong>增长困难。</strong></li>
+<li>大多数操作系统使用“线性列表”来组织目录。</li>
+</ul>
+<h5 id="分配方法"><a href="#分配方法" class="headerlink" title="分配方法"></a>分配方法</h5><ul>
+<li>如何为文件分配空间以便利用磁盘空间并快速访问文件？</li>
+<li>三种主要分配方法</li>
+</ul>
+<ol>
+<li>连续分配</li>
+<li>链接分配</li>
+<li>索引分配</li>
+</ol>
+<h5 id="连续分配"><a href="#连续分配" class="headerlink" title="连续分配"></a>连续分配</h5><ul>
+<li>要求每个文件在磁盘上占用一组连续块。</li>
+<li>优缺点：</li>
+<li>√ 简单：只有起始位置（块号）和长度（块数）保存在FCB中</li>
+<li>√ 支持随机访问</li>
+<li>√ 对缓存友好</li>
+<li>× 产生外部碎片：动态存储分配问题</li>
+<li>× 难以扩展文件  <img src="8.png" width="50%" height="80%" /></li>
+</ul>
+<h5 id="链接分配"><a href="#链接分配" class="headerlink" title="链接分配"></a>链接分配</h5><ul>
+<li>每个文件都是磁盘块的链接列表。</li>
+<li>FCB包含文件<strong>第一块的指针</strong>和<strong>最后一块的指针</strong>。</li>
+<li>每个块包含一个指向下一个块的指针。</li>
+<li>这些指针对用户不可见，因此，如果每个块是512字节,磁盘地址（指针）为4个字节，则用户看到508个字节的块。</li>
+<li>优缺点：</li>
+<li>√ 简单：只需要起始地址</li>
+<li>√ 不浪费空间</li>
+<li>√ 指针需要额外的空间</li>
+<li>√ 没有随机存取，(用单项链表)只能顺序访问</li>
+<li>× 可靠性：分散在整个磁盘上的指针</li>
+<li>指针的开销可以通过将几个块收集到一个称为群集的较大块中来降低</li>
+<li>为了解决简单链接分配的问题，每个分区开始处的一段磁盘被放置在一旁，以包含一个包含文件系统所有指针的表。</li>
+<li>文件分配表(FAT)：一个简单但有效的磁盘空间分配方法，<strong>用于MS-DOS和OS/2</strong>。</li>
+<li>每一个卷的开始部分用于存储该FAT。</li>
+<li>每块都在该表中有一项。</li>
+<li>该表可以通过块号码来索引。  <img src="9.png" width="60%" height="80%" /></li>
+</ul>
+<h5 id="索引分配"><a href="#索引分配" class="headerlink" title="索引分配"></a>索引分配</h5><ul>
+<li>将所有指向文件磁盘块的指针合并到一个位置：索引块。索引块包含一系列磁盘块地址。</li>
+<li>解决了连续分配的外部碎片和大小声明问题。  <img src="10.png" width="45%" height="80%" /></li>
+<li>优缺点</li>
+<li>√ 支持直接/随机访问</li>
+<li>√ 没有外部碎片(但有索引块的开销)。</li>
+<li>× 需要索引表。  </li>
+<li>索引块的大小：</li>
+</ul>
+<ol>
+<li>链接方案</li>
+<li>多级索引</li>
+<li>(以上两种)组合方案 (这是大多数UNIX文件系统使用的方案)  <img src="11.png" width="55%" height="80%" /></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Dai Sine</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://daisine.github.io/os11/">https://daisine.github.io/os11/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/note/">note</a></div><div class="post_share"><div class="social-share" data-image="/img/mai4.ico" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/macvpn/"><img class="prev-cover" src="/img/mai3.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">Mac OS X下连接校园网VPN [L2TP方式]</div></div></a></div><div class="next-post pull-right"><a href="/os10/"><img class="next-cover" src="/img/mai8.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">操作系统笔记10 虚拟内存</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/CG/" title="计算机图形学笔记及练习"><img class="cover" src="/img/mai11.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-12-21</div><div class="title">计算机图形学笔记及练习</div></div></a></div><div><a href="/Cryptography/" title="密码学笔记"><img class="cover" src="/img/mai8.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-12-01</div><div class="title">密码学笔记</div></div></a></div><div><a href="/cky/" title="C语言-考研专业课笔记"><img class="cover" src="/img/mai8.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-02</div><div class="title">C语言-考研专业课笔记</div></div></a></div><div><a href="/cn1/" title="计算机网络笔记01 计算机网络和因特网"><img class="cover" src="/img/mai5.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-06-08</div><div class="title">计算机网络笔记01 计算机网络和因特网</div></div></a></div><div><a href="/cn2/" title="计算机网络笔记02 应用层"><img class="cover" src="/img/mai6.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-06-08</div><div class="title">计算机网络笔记02 应用层</div></div></a></div><div><a href="/cn3/" title="计算机网络笔记03 运输层"><img class="cover" src="/img/mai4.ico" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-06-08</div><div class="title">计算机网络笔记03 运输层</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Dai Sine</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/daisine" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:daisine@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%8F%A3-%E7%94%A8%E6%88%B7%E8%A7%92%E5%BA%A6"><span class="toc-number">1.</span> <span class="toc-text">文件系统接口(用户角度)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.</span> <span class="toc-text">文件概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-number">1.2.</span> <span class="toc-text">目录结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%8C%82%E8%BD%BD"><span class="toc-number">1.3.</span> <span class="toc-text">文件系统挂载</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E5%85%B1%E4%BA%AB"><span class="toc-number">1.4.</span> <span class="toc-text">文件共享</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E4%BF%9D%E6%8A%A4"><span class="toc-number">1.5.</span> <span class="toc-text">文件保护</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">文件系统实现</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%BB%93%E6%9E%84"><span class="toc-number">2.1.</span> <span class="toc-text">文件系统结构</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F-VFS"><span class="toc-number">2.2.</span> <span class="toc-text">虚拟文件系统(VFS)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.3.</span> <span class="toc-text">目录实现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%86%E9%85%8D%E6%96%B9%E6%B3%95"><span class="toc-number">2.4.</span> <span class="toc-text">分配方法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D"><span class="toc-number">2.5.</span> <span class="toc-text">连续分配</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%93%BE%E6%8E%A5%E5%88%86%E9%85%8D"><span class="toc-number">2.6.</span> <span class="toc-text">链接分配</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E5%88%86%E9%85%8D"><span class="toc-number">2.7.</span> <span class="toc-text">索引分配</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/mysql/" title="软件设计编写中mysql related"><img src="/img/mai8.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="软件设计编写中mysql related"/></a><div class="content"><a class="title" href="/mysql/" title="软件设计编写中mysql related">软件设计编写中mysql related</a><time datetime="2022-08-15T07:31:21.000Z" title="Created 2022-08-15 15:31:21">2022-08-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-ide/" title="QtCreator/VS2015/Clion配置"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="QtCreator/VS2015/Clion配置"/></a><div class="content"><a class="title" href="/qt-ide/" title="QtCreator/VS2015/Clion配置">QtCreator/VS2015/Clion配置</a><time datetime="2022-07-08T08:32:22.000Z" title="Created 2022-07-08 16:32:22">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-class/" title="Qt开发笔记"><img src="/img/mai4.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt开发笔记"/></a><div class="content"><a class="title" href="/qt-class/" title="Qt开发笔记">Qt开发笔记</a><time datetime="2022-07-08T01:45:12.000Z" title="Created 2022-07-08 09:45:12">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/mac-ntfs/" title="Mac 读写ntfs U盘"><img src="/img/mai5.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Mac 读写ntfs U盘"/></a><div class="content"><a class="title" href="/mac-ntfs/" title="Mac 读写ntfs U盘">Mac 读写ntfs U盘</a><time datetime="2022-07-05T08:20:28.000Z" title="Created 2022-07-05 16:20:28">2022-07-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-msvc-clion/qt-msvc-clion/" title="No title"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="No title"/></a><div class="content"><a class="title" href="/qt-msvc-clion/qt-msvc-clion/" title="No title">No title</a><time datetime="2022-06-21T07:20:07.233Z" title="Created 2022-06-21 15:20:07">2022-06-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2017 - 2023 By Dai Sine</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

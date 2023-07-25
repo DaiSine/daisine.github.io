@@ -1,0 +1,210 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>软件设计编写中mysql related | Hi, Dai</title><meta name="keywords" content="mysql"><meta name="author" content="Dai Sine"><meta name="copyright" content="Dai Sine"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="mysql语句1234# mysql重置自增主键id值，可以为0或者目前最小id值ALTER TABLE table_name AUTO_INCREMENT &#x3D; 0;# 替换某个表中的字段值字符串 replaceUPDATE table_name SET 字段名 &#x3D; REPLACE(&amp;#x27;str&amp;#x27;, &amp;#x27;from_str&amp;#x27;, &amp;#x27;to_str&amp;#x27;)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件设计编写中mysql related">
+<meta property="og:url" content="https://daisine.github.io/mysql/index.html">
+<meta property="og:site_name" content="Hi, Dai">
+<meta property="og:description" content="mysql语句1234# mysql重置自增主键id值，可以为0或者目前最小id值ALTER TABLE table_name AUTO_INCREMENT &#x3D; 0;# 替换某个表中的字段值字符串 replaceUPDATE table_name SET 字段名 &#x3D; REPLACE(&amp;#x27;str&amp;#x27;, &amp;#x27;from_str&amp;#x27;, &amp;#x27;to_str&amp;#x27;)">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://daisine.github.io/img/mai8.ico">
+<meta property="article:published_time" content="2022-08-15T07:31:21.000Z">
+<meta property="article:modified_time" content="2022-10-14T08:24:20.793Z">
+<meta property="article:author" content="Dai Sine">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://daisine.github.io/img/mai8.ico"><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://daisine.github.io/mysql/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-117497526-4"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-117497526-4');
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '软件设计编写中mysql related',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-10-14 16:24:20'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/mai8.ico')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Hi, Dai</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">软件设计编写中mysql related</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-08-15T07:31:21.000Z" title="Created 2022-08-15 15:31:21">2022-08-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-10-14T08:24:20.793Z" title="Updated 2022-10-14 16:24:20">2022-10-14</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="软件设计编写中mysql related"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h3 id="mysql语句"><a href="#mysql语句" class="headerlink" title="mysql语句"></a>mysql语句</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># mysql重置自增主键id值，可以为0或者目前最小id值</span><br><span class="line">ALTER TABLE table_name AUTO_INCREMENT = 0;</span><br><span class="line"># 替换某个表中的字段值字符串 replace</span><br><span class="line">UPDATE table_name SET 字段名 = REPLACE(&#x27;str&#x27;, &#x27;from_str&#x27;, &#x27;to_str&#x27;) where 字段名 like &#x27;%str%&#x27;</span><br></pre></td></tr></table></figure>
+
+<h3 id="mysql基础"><a href="#mysql基础" class="headerlink" title="mysql基础"></a>mysql基础</h3><ul>
+<li>bool类型会被存储为TINYINT(1)</li>
+<li>设置自增主键为已有最小值开始自增：ALTER TABLE <code>table_name</code> AUTO_INCREMENT =1;</li>
+</ul>
+<h3 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000019447574">https://segmentfault.com/a/1190000019447574</a></p>
+</blockquote>
+<h4 id="整型"><a href="#整型" class="headerlink" title="整型"></a>整型</h4><p>MySQL 可以为整数类型指定宽度，例如 <code>INT(11)</code>，对大多数应用这是没有意义的：它不会限制值的合法范围，只是规定了 MySQL 的一些交互工具（例如 MySQL 命令行客户端）用来显示字符的个数。对于存储和计算来说，<code>INT(1)</code> 和 <code>INT(20)</code> 是相同的。只有使用 <code>ZEROFILL</code> 属性时，指定长度才有意义（按照指定长度进行零的填充）。</p>
+<p>所以，在不使用 <code>ZEROFILL</code> 时，不需要指定整形的长度。</p>
+<ul>
+<li><strong>TINYINT</strong><br>空间占用为 <code>1 byte</code> ( <code>8 bit</code> ) 。使用无符号类型（<code>UNSIGNED</code>）时，<code>8</code> 位都是 <code>1</code> 时所表示的十进制数为 <code>255</code>，所以其可存储的范围为 <code>0 ～ 255</code>。使用有符号类型时，范围为 <code>-128 ～ 127</code>。</li>
+<li><strong>SMALLINT</strong><br>空间占用为 <code>2 byte</code>，可存储的无符号范围为 <code>0 ～ 65535</code>，有符号范围为 <code>-32768 ～ 32767</code>。</li>
+<li><strong>MEDIUMINT</strong><br>空间占用为 <code>3 byte</code>，可存储的无符号范围为 <code>0 ～ 16777215</code>，有符号范围为 <code>-8388608 ～ 8388607</code>。</li>
+<li><strong>INT</strong><br>空间占用为 <code>4 byte</code>，可存储的无符号范围为 <code>0 ～ 4294967295</code>，有符号范围为 <code>-2147483648 ～ 2147483647</code>。</li>
+<li><strong>BIGINT</strong><br>空间占用为 <code>8 byte</code>，可存储的无符号范围为 <code>0 ～ 18446744073709551615</code>，有符号范围为 <code>-9223372036854775808 ～ 9223372036854775807</code>。</li>
+</ul>
+<h4 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h4><ul>
+<li><strong>CHAR</strong><ul>
+<li>定长字符串，设定该类型字段时需要指定长度，存储时会向右边补充空格到指定长度。</li>
+<li><strong>该类型所指定的长度是指字符的个数（无论中文/英文/中文标点/英文标点，只要是一个符号就会占用一个个数），而不是字符串所占的字节数。</strong> 例如，CHAR(6) 类型的字段用于存储字符串 “<code>Hello!</code>” 和 “<code>你好，世界！</code>” 都是可以的。</li>
+<li>该类型可设定的<code>最大长度</code>为 <code>255</code> 个字符。</li>
+</ul>
+</li>
+<li><strong>VARCHAR</strong><ul>
+<li>变长字符串，设定该类型字段时同样需要指定长度，长度同样是指最多可存储的字符个数。</li>
+<li>可设定的最大有效长度取决于行长度限制，详见：<a target="_blank" rel="noopener" href="https://link.segmentfault.com/?enc=CT2F+uci5TPdEQmygDhpsQ==.D4FRe8Dg5Zq3myIwDXZvZUJ1b9IsrHeQD68E5kvuxaINN5uIZ738DjkvSzMKxQ8YahGiNXg7ciliHOjxxv5t5g==">MySQL中varchar最大长度是多少</a>。</li>
+</ul>
+</li>
+<li><strong>TINYTEXT</strong><ul>
+<li>最多可存储 <code>255 byte</code> 的文本内容，也就是说在 <code>UTF8</code> 编码下可以存储 <code>255</code> 个英文字母/英文符号，而汉字/中文符号最多只能存储 <code>85</code>（<code>255/3</code>）个。以下类型同样可推算。</li>
+</ul>
+</li>
+<li><strong>TEXT</strong><ul>
+<li>最多可存储 <code>65535 byte 约等于 65KB</code> 的文本内容。</li>
+</ul>
+</li>
+<li><strong>MEDIUMTEXT</strong><ul>
+<li>最多可存储 <code>16777215 byte 约等于 16MB</code> 的文本内容。</li>
+</ul>
+</li>
+<li><strong>LONGTEXT</strong><ul>
+<li>最多可存储 <code>4294967295 byte 约等于 4GB</code> 的文本内容。</li>
+</ul>
+</li>
+</ul>
+<h4 id="日期与时间"><a href="#日期与时间" class="headerlink" title="日期与时间"></a>日期与时间</h4><ul>
+<li><strong>TIMESTAMP</strong><ul>
+<li>时间戳，范围从 <code>1970-01-01 00:00:01 UTC</code> 到 <code>2038-01-09 03:14:07 UTC</code>（<code>UTC</code> 转换成东八区时间需要 <code>+08:00</code>），存储为自纪元（<code>1970-01-01 00:00:00 UTC</code>）起的秒数。</li>
+<li>虽然内部存储的是秒数，但是在读写该类型字段时都是以日期时间字符串的形式进行的，例如，查询到的实际是一个字符串 <code>&#39;2019-06-11 23:18:45&#39;</code>，执行 <code>INSERT</code> 或 <code>UPDATE</code> 操作时，也是需要传入一个日期时间字符串。</li>
+<li>时间戳类型也可以指定长度，用以表示秒级以下的精度，最高可设为 <code>6</code>。例如，当精度为 <code>5</code> 时查询或传入的字符串形式为 <code>&#39;2019-06-12 13:22:21.35927&#39;</code>。</li>
+</ul>
+</li>
+</ul>
+<h4 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h4><p>用于存储 <code>JSON</code> 文本，不可以指定长度，不可以设定默认值。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Dai Sine</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://daisine.github.io/mysql/">https://daisine.github.io/mysql/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/mysql/">mysql</a></div><div class="post_share"><div class="social-share" data-image="/img/mai8.ico" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/qt-ide/"><img class="next-cover" src="/img/mai7.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">QtCreator/VS2015/Clion配置</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Dai Sine</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/daisine" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:daisine@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#mysql%E8%AF%AD%E5%8F%A5"><span class="toc-number">1.</span> <span class="toc-text">mysql语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mysql%E5%9F%BA%E7%A1%80"><span class="toc-number">2.</span> <span class="toc-text">mysql基础</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E5%9E%8B"><span class="toc-number">3.1.</span> <span class="toc-text">整型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E6%9C%AC"><span class="toc-number">3.2.</span> <span class="toc-text">文本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A5%E6%9C%9F%E4%B8%8E%E6%97%B6%E9%97%B4"><span class="toc-number">3.3.</span> <span class="toc-text">日期与时间</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JSON"><span class="toc-number">3.4.</span> <span class="toc-text">JSON</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/mysql/" title="软件设计编写中mysql related"><img src="/img/mai8.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="软件设计编写中mysql related"/></a><div class="content"><a class="title" href="/mysql/" title="软件设计编写中mysql related">软件设计编写中mysql related</a><time datetime="2022-08-15T07:31:21.000Z" title="Created 2022-08-15 15:31:21">2022-08-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-ide/" title="QtCreator/VS2015/Clion配置"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="QtCreator/VS2015/Clion配置"/></a><div class="content"><a class="title" href="/qt-ide/" title="QtCreator/VS2015/Clion配置">QtCreator/VS2015/Clion配置</a><time datetime="2022-07-08T08:32:22.000Z" title="Created 2022-07-08 16:32:22">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-class/" title="Qt开发笔记"><img src="/img/mai4.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt开发笔记"/></a><div class="content"><a class="title" href="/qt-class/" title="Qt开发笔记">Qt开发笔记</a><time datetime="2022-07-08T01:45:12.000Z" title="Created 2022-07-08 09:45:12">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/mac-ntfs/" title="Mac 读写ntfs U盘"><img src="/img/mai5.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Mac 读写ntfs U盘"/></a><div class="content"><a class="title" href="/mac-ntfs/" title="Mac 读写ntfs U盘">Mac 读写ntfs U盘</a><time datetime="2022-07-05T08:20:28.000Z" title="Created 2022-07-05 16:20:28">2022-07-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-msvc-clion/qt-msvc-clion/" title="No title"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="No title"/></a><div class="content"><a class="title" href="/qt-msvc-clion/qt-msvc-clion/" title="No title">No title</a><time datetime="2022-06-21T07:20:07.233Z" title="Created 2022-06-21 15:20:07">2022-06-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2017 - 2023 By Dai Sine</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

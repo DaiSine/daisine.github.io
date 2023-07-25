@@ -1,0 +1,275 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pandas笔记 | Hi, Dai</title><meta name="keywords" content="pandas"><meta name="author" content="Dai Sine"><meta name="copyright" content="Dai Sine"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Useful linkJoyful Pandas：http:&#x2F;&#x2F;joyfulpandas.datawhale.club&#x2F;Content&#x2F; Pandas学习Blog：https:&#x2F;&#x2F;re-thought.com&#x2F;author&#x2F;anna&#x2F; Dataframe基础操作 改变某一列的数据类型：&#96;&#96;df[‘col_name’]&#x3D; df[‘col_name’].astype(float)&#96;  某一列的值转换为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pandas笔记">
+<meta property="og:url" content="https://daisine.github.io/pandas/index.html">
+<meta property="og:site_name" content="Hi, Dai">
+<meta property="og:description" content="Useful linkJoyful Pandas：http:&#x2F;&#x2F;joyfulpandas.datawhale.club&#x2F;Content&#x2F; Pandas学习Blog：https:&#x2F;&#x2F;re-thought.com&#x2F;author&#x2F;anna&#x2F; Dataframe基础操作 改变某一列的数据类型：&#96;&#96;df[‘col_name’]&#x3D; df[‘col_name’].astype(float)&#96;  某一列的值转换为">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://daisine.github.io/img/mai4.ico">
+<meta property="article:published_time" content="2022-03-09T05:56:12.000Z">
+<meta property="article:modified_time" content="2022-10-14T07:42:30.636Z">
+<meta property="article:author" content="Dai Sine">
+<meta property="article:tag" content="pandas">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://daisine.github.io/img/mai4.ico"><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://daisine.github.io/pandas/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-117497526-4"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-117497526-4');
+</script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Pandas笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-10-14 15:42:30'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/mai4.ico')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Hi, Dai</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Pandas笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-03-09T05:56:12.000Z" title="Created 2022-03-09 13:56:12">2022-03-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-10-14T07:42:30.636Z" title="Updated 2022-10-14 15:42:30">2022-10-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/python/">python</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Pandas笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h3 id="Useful-link"><a href="#Useful-link" class="headerlink" title="Useful link"></a>Useful link</h3><p>Joyful Pandas：<a target="_blank" rel="noopener" href="http://joyfulpandas.datawhale.club/Content/">http://joyfulpandas.datawhale.club/Content/</a></p>
+<p>Pandas学习Blog：<a target="_blank" rel="noopener" href="https://re-thought.com/author/anna/">https://re-thought.com/author/anna/</a></p>
+<h3 id="Dataframe"><a href="#Dataframe" class="headerlink" title="Dataframe"></a>Dataframe</h3><h4 id="基础操作"><a href="#基础操作" class="headerlink" title="基础操作"></a>基础操作</h4><ul>
+<li><p>改变某一列的数据类型：``df[‘col_name’]= df[‘col_name’].astype(float)`</p>
+</li>
+<li><p>某一列的值转换为列表输出：<code>df[num_name].to_list()</code></p>
+</li>
+<li><p>按某列的值排序:<code>df.sort_values(by=&quot;DUT&quot;, ascending=True)</code>，ascending=True为升序，False为降序</p>
+</li>
+<li><p>新增一列相同值的数据：<code>df[&#39;col_name&#39;]=?</code></p>
+</li>
+<li><p>改变列顺序/按指定顺序提取列：<code>df =df[[&#39;col1&#39;, &#39;col2&#39;]]</code></p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">repeat_df = df[ids.isin(ids[ids.duplicated()])].sort_index()</span><br><span class="line"><span class="comment"># 遍历df的index</span></span><br><span class="line"> <span class="keyword">for</span> x <span class="keyword">in</span> df.index:</span><br><span class="line">        <span class="comment"># 取这个索引某一列的值</span></span><br><span class="line">        item = df.loc[x, <span class="string">&quot;col_name&quot;</span>]</span><br><span class="line">        <span class="comment"># df加一行数据，df.iloc[index]，inde为int类型</span></span><br><span class="line">        error_df = error_df.append(df.iloc[x], ignore_index=<span class="literal">False</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="拼接-重复列名处理suffixes"><a href="#拼接-重复列名处理suffixes" class="headerlink" title="拼接 (重复列名处理suffixes)"></a>拼接 (重复列名处理suffixes)</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># suffixes默认值为[&#x27;_x&#x27;, &#x27;_y&#x27;]</span></span><br><span class="line">new_df = pd.merge(scc_df1, src_df2,  on=<span class="string">&#x27;col_name&#x27;</span>, suffixes=[<span class="string">&#x27;_L&#x27;</span>, <span class="string">&quot;_R&quot;</span>])</span><br><span class="line"></span><br><span class="line">df1.merge(df2, on=[<span class="string">&#x27;Name&#x27;</span>, <span class="string">&#x27;Class&#x27;</span>], how=<span class="string">&#x27;left&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">df.groupby(分组依据)[数据来源].使用操作</span><br><span class="line">df.groupby(<span class="string">&#x27;col_name&#x27;</span>)</span><br><span class="line">df.groupby(<span class="string">&#x27;Gender&#x27;</span>)[<span class="string">&#x27;Longevity&#x27;</span>].mean()</span><br><span class="line">df.groupby([<span class="string">&#x27;School&#x27;</span>, <span class="string">&#x27;Gender&#x27;</span>])[<span class="string">&#x27;Height&#x27;</span>].mean() <span class="comment"># 两个维度分组</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#按A列进行分组，得到分组后的groupby对象</span></span><br><span class="line">df_gp = df.groupby(<span class="string">&quot;A&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#得到分组的总长度</span></span><br><span class="line"><span class="built_in">len</span>(df_gp.count())</span><br><span class="line">df_gp.size().size</span><br><span class="line"></span><br><span class="line"><span class="comment">#得到分组后的分组值 List</span></span><br><span class="line"><span class="built_in">list</span>(df_gp.size().index.values)</span><br><span class="line"></span><br><span class="line"><span class="comment">#取出行分组值为&quot;School&quot;的df</span></span><br><span class="line">df_gp.get_group(<span class="string">&quot;Schoolg&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改列名-索引"><a href="#修改列名-索引" class="headerlink" title="修改列名/索引"></a>修改列名/索引</h4><ul>
+<li>修改某个/几个index/列标签：df.rename(index={0: ‘均值’}, columns= inplace=True)</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.rename(index=&#123;<span class="number">0</span>: <span class="string">&#x27;均值&#x27;</span>&#125;, columns=&#123;<span class="string">&#x27;one&#x27;</span>: <span class="string">&#x27;1&#x27;</span>&#125;, inplace=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定一列数据作为新的index：<code>DataFrame.set_index(keys, drop=True, append=False, inplace=False, verify_integrity=False)</code><ul>
+<li><strong>keys</strong>：列标签或列标签/数组列表，需要设置为索引的列</li>
+<li><strong>drop：</strong>默认为True，删除用作新索引的列</li>
+<li>append：是否将列附加到现有索引，默认为<strong>False</strong>。</li>
+<li><strong>inplace</strong>：输入布尔值，表示当前操作是否对原数据生效，默认为<strong>False</strong>。</li>
+<li>verify_integrity：检查新索引的副本。否则，请将检查推迟到必要时进行。将其设置为false将提高该方法的性能，默认为<strong>false。</strong></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 将col_name这一列的值作为新的索引，drop默认为True，删除原来那一列数据</span></span><br><span class="line">df.set_index(<span class="string">&#x27;col_name&#x27;</span>, inplace=<span class="literal">True</span>)</span><br><span class="line"><span class="comment"># </span></span><br></pre></td></tr></table></figure>
+
+<h4 id="读取指定列与行"><a href="#读取指定列与行" class="headerlink" title="读取指定列与行"></a>读取指定列与行</h4><p>loc：基于标签的名称，包括行标签(index)和列标签(columns)，即行名称和列名称，可以使用:</p>
+<ul>
+<li><code>df.loc[index_name,col_name]</code> <ul>
+<li>index可以是单个标签，List标签，或者切片标签</li>
+<li>columns为单个标签，List标签，或者切片标签</li>
+</ul>
+</li>
+<li><code>df.loc[df.one &gt; 2]</code> / <code>df.loc[ df.one&gt; 2, [&#39;one&#39;]]</code>([‘one’]返回df，’one’返回series)返回符合列Bool条件的指定列，<strong>Bool条件中调用列的名称不加引号</strong></li>
+</ul>
+<p>iloc：基于标签的位置序号，行和列标签序号从0开始。</p>
+<p>df[….]：可以读取列：<code>df[&#39;col_name&#39;]</code> 读行：<code>df[5:10]</code>(行序号，左闭右开)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">   one  two</span><br><span class="line">a  <span class="number">1.0</span>  <span class="number">1.0</span></span><br><span class="line">b  <span class="number">2.0</span>  <span class="number">2.0</span></span><br><span class="line">c  <span class="number">3.0</span>  <span class="number">3.0</span></span><br><span class="line">d  NaN  <span class="number">4.0</span></span><br><span class="line">df.loc[<span class="string">&#x27;b&#x27;</span>:<span class="string">&#x27;c&#x27;</span>](此处切片是闭区间) </span><br><span class="line">df.iloc[<span class="number">1</span>:<span class="number">3</span>]左闭右开</span><br><span class="line">   one  two</span><br><span class="line">b  <span class="number">2.0</span>  <span class="number">2.0</span></span><br><span class="line">c  <span class="number">3.0</span>  <span class="number">3.0</span></span><br><span class="line"></span><br><span class="line">df.loc[[<span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;d&#x27;</span>], [<span class="string">&#x27;one&#x27;</span>, <span class="string">&#x27;two&#x27;</span>]]</span><br><span class="line">df.iloc[[<span class="number">1</span>,<span class="number">3</span>], [<span class="number">0</span>,<span class="number">1</span>]]</span><br><span class="line">   one  two</span><br><span class="line">b  <span class="number">2.0</span>  <span class="number">2.0</span></span><br><span class="line">d  NaN  <span class="number">4.0</span></span><br><span class="line"></span><br><span class="line">df.loc[<span class="string">&#x27;d&#x27;</span>, <span class="string">&#x27;one&#x27;</span>]</span><br><span class="line">df.iloc[<span class="number">3</span>,<span class="number">0</span>]</span><br><span class="line">nan</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-----col-----</span><br><span class="line">df[<span class="string">&#x27;col_name&#x27;</span>]  df[[<span class="string">&#x27;col1&#x27;</span>, <span class="string">&#x27;col2&#x27;</span>]]<span class="comment"># 固定列名的行</span></span><br><span class="line">df[df.columns[<span class="number">0</span>]] <span class="comment"># 第一列series，列名为序号0</span></span><br><span class="line">df[df.columns[<span class="number">0</span>:<span class="number">1</span>]] <span class="comment"># 第一列df</span></span><br><span class="line">df[df.columns[<span class="number">2</span>:]] <span class="comment"># 第3列到最后一列(与字符串截取一样，左闭右开)</span></span><br><span class="line">-----row-----</span><br><span class="line">df[<span class="number">5</span>:<span class="number">10</span>] <span class="comment"># 读取6到10行数据</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">columns_to_use_list = [<span class="string">&#x27;col1&#x27;</span>, <span class="string">&#x27;col2&#x27;</span>, <span class="string">&#x27;col3&#x27;</span>]</span><br><span class="line"><span class="comment"># 在读取时读取指定列名：列名不匹配则会忽略 </span></span><br><span class="line"><span class="comment"># 重复列名在读取时会自动添加后缀: .1 .2，因此columns_to_use_list中重复列名也需要添加对应后缀</span></span><br><span class="line">df = pd.read_csv(filename, header=<span class="number">0</span>, usecols=<span class="keyword">lambda</span> c: c <span class="keyword">in</span> columns_to_use_list)</span><br><span class="line"><span class="comment"># 列名不匹配会报错</span></span><br><span class="line">df = df[columns_to_use_list]</span><br></pre></td></tr></table></figure>
+
+<h4 id="添加-合并两个Col标签一样的df"><a href="#添加-合并两个Col标签一样的df" class="headerlink" title="添加/合并两个Col标签一样的df"></a>添加/合并两个Col标签一样的df</h4><ul>
+<li>新增一行数据：<code>df.append([&#123;&#39;col1&#39;: value&#125;], ignore_index=True)</code>，如果col值字典中没有的列，则该列值为Nan</li>
+<li>合并两个df：<code>df1.append(df2, ignore_index=True/FALSE)</code><ul>
+<li>ignore_index：默认为False，保持原有的index，True则重新生成从0开始的整数index，</li>
+</ul>
+</li>
+</ul>
+<h3 id="Series"><a href="#Series" class="headerlink" title="Series"></a>Series</h3><h4 id="遍历series中的index与值"><a href="#遍历series中的index与值" class="headerlink" title="遍历series中的index与值"></a>遍历series中的index与值</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> index, value <span class="keyword">in</span> test.items():</span><br><span class="line">    <span class="built_in">print</span>(index, value )</span><br><span class="line"><span class="keyword">for</span> index, value <span class="keyword">in</span> test.iteritems():</span><br><span class="line">    <span class="built_in">print</span>(index, value)</span><br></pre></td></tr></table></figure>
+
+<p>获取series中的最大值与对应index：<code>series.max()</code> ,<code>series.idxmax()</code></p>
+<h4 id="Series转置为df"><a href="#Series转置为df" class="headerlink" title="Series转置为df"></a>Series转置为df</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">s = df.mean()</span><br><span class="line">s_df = s.to_frame().T  <span class="comment"># to_frame().df.transpose()</span></span><br><span class="line">s_df.rename(index=&#123;<span class="number">0</span>: <span class="string">&#x27;均值&#x27;</span>&#125;, inplace=<span class="literal">True</span>)</span><br><span class="line">one    <span class="number">2.0</span>             one  two</span><br><span class="line">two    <span class="number">2.5</span>     -&gt;      均值  <span class="number">2.0</span>  <span class="number">2.5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Dataframe与Series的通用操作"><a href="#Dataframe与Series的通用操作" class="headerlink" title="Dataframe与Series的通用操作"></a>Dataframe与Series的通用操作</h3><ul>
+<li>转置：<code>.transpose() / .T</code></li>
+<li>对小数位数进行<strong>四舍五入，而不是对小数点的输出格式进行指定</strong> ]：<code>.round(小数位数) / .round(&#123;&#39;col1&#39;:2, &#39;col2&#39;:3&#125;)</code>，返回新对象，原对象不作修改</li>
+<li></li>
+</ul>
+<h3 id="df-to-excel-调整列宽"><a href="#df-to-excel-调整列宽" class="headerlink" title="df.to_excel 调整列宽"></a>df.to_excel 调整列宽</h3><h4 id="pd-ExcelWriter的使用方法"><a href="#pd-ExcelWriter的使用方法" class="headerlink" title="pd.ExcelWriter的使用方法"></a>pd.ExcelWriter的使用方法</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Create a Pandas Excel writer using XlsxWriter as the engine.</span></span><br><span class="line">writer = pd.ExcelWriter(<span class="string">&#x27;pandas_simple.xlsx&#x27;</span>, engine=<span class="string">&#x27;xlsxwriter&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Convert the dataframe to an XlsxWriter Excel object.</span></span><br><span class="line">df.to_excel(writer, sheet_name=<span class="string">&#x27;Sheet1&#x27;</span>) ***<span class="comment">#this is where you create Sheet 1***</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Get the xlsxwriter objects from the dataframe writer object.</span></span><br><span class="line">workbook  = writer.book</span><br><span class="line">worksheet = writer.sheets[<span class="string">&#x27;Sheet1&#x27;</span>] ***<span class="comment">#here is where you select it***</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="ExcelWriter调整Excel列宽"><a href="#ExcelWriter调整Excel列宽" class="headerlink" title="ExcelWriter调整Excel列宽"></a>ExcelWriter调整Excel列宽</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 动态调整所有列长：</span></span><br><span class="line">writer = pd.ExcelWriter(<span class="string">&#x27;/path/file.xlsx&#x27;</span>) </span><br><span class="line">df.to_excel(writer, sheet_name=<span class="string">&#x27;sheetName&#x27;</span>, index=<span class="literal">False</span>, na_rep=<span class="string">&#x27;NaN&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> column <span class="keyword">in</span> df:</span><br><span class="line">    column_length = <span class="built_in">max</span>(df[column].astype(<span class="built_in">str</span>).<span class="built_in">map</span>(<span class="built_in">len</span>).<span class="built_in">max</span>(), <span class="built_in">len</span>(column))</span><br><span class="line">    col_idx = df.columns.get_loc(column)</span><br><span class="line">    writer.sheets[<span class="string">&#x27;sheetName&#x27;</span>].set_column(col_idx, col_idx, column_length)</span><br><span class="line"></span><br><span class="line">writer.save()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用列名手动调整列</span></span><br><span class="line">col_idx = df.columns.get_loc(<span class="string">&#x27;columnName&#x27;</span>)</span><br><span class="line">writer.sheets[<span class="string">&#x27;sheetName&#x27;</span>].set_column(col_idx, col_idx, <span class="number">15</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用列索引手动调整列</span></span><br><span class="line">writer.sheets[<span class="string">&#x27;sheetName&#x27;</span>].set_column(col_idx, col_idx, <span class="number">15</span>)</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="pandas读取过大过小数字的数据-科学计数法的处理"><a href="#pandas读取过大过小数字的数据-科学计数法的处理" class="headerlink" title="pandas读取过大过小数字的数据/科学计数法的处理"></a>pandas读取过大过小数字的数据/科学计数法的处理</h3><ul>
+<li><p>科学记数法（带 e 的数字）：表示非常大或非常小的数字的方法。当 1 到 10 之间的数字乘以 10 的幂时，数字以科学计数法书写。(Python Pandas使用该符号标准，在读取过大或者过小数据时会自动转换为科学计数法)</p>
+<ul>
+<li>2.3 <strong>e</strong> -5: 2.3 乘以 10 的负五次方 / 0.000023</li>
+<li>4.5 <strong>e</strong>+6: 4.5 乘以 10 的 6 次方 / 4500000 </li>
+</ul>
+</li>
+<li><p>Python float Type : inf</p>
+<ul>
+<li>python中的正无穷或负无穷，使用float(“inf”)或float(“-inf”)来表示</li>
+<li>float(“inf”)，float(“INF”)或者float(‘Inf’)都是可以的</li>
+<li>涉及 &gt; 和 &lt; 比较时，所有数都比无穷小float(“-inf”)大，所有数都比无穷大float(“inf”)小，无穷大本身和无穷大是相等的</li>
+</ul>
+</li>
+<li><p>Python float Type : nan(not a number)</p>
+<ul>
+<li>nan不是一个数，与任何数字的相关计算结果都为nan</li>
+<li>涉及 &gt; 和 &lt; 和==比较时，结果都是False(nan==nan，结果也是False)</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> math</span><br><span class="line"><span class="comment"># isinf() isnan() </span></span><br><span class="line">n = <span class="built_in">float</span>(<span class="string">&#x27;inf&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(math.isinf(n))  <span class="comment"># True</span></span><br><span class="line">m = <span class="built_in">float</span>(<span class="string">&#x27;nan&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(math.isnan(m))  <span class="comment"># True</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a target="_blank" rel="noopener" href="https://re-thought.com/how-to-suppress-scientific-notation-in-pandas/">在pandas抑制自动转换的科学计数法</a>：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(np.random.random(<span class="number">5</span>)**<span class="number">10</span>, columns=[<span class="string">&#x27;random&#x27;</span>])</span><br><span class="line"><span class="comment"># 解决方案 1：使用 .round()</span></span><br><span class="line">df.<span class="built_in">round</span>(<span class="number">5</span>)  <span class="comment"># 5 - 小数位数</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解决方案 2：使用 apply 更改格式</span></span><br><span class="line">df.apply(<span class="keyword">lambda</span> x: <span class="string">&#x27;%.5f&#x27;</span> % x, axis=<span class="number">1</span>)</span><br><span class="line">df[<span class="string">&#x27;random&#x27;</span>].apply(<span class="keyword">lambda</span> x: <span class="string">&#x27;%.5f&#x27;</span> % x)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解决方案 3：使用 .set_option()</span></span><br><span class="line"><span class="comment"># 请注意，.set_option()在 Jupyter Notebooks 中全局更改行为，因此它不是临时修复。</span></span><br><span class="line">pd.set_option(<span class="string">&#x27;display.float_format&#x27;</span>, <span class="keyword">lambda</span> x: <span class="string">&#x27;%.5f&#x27;</span> % x)</span><br><span class="line"><span class="comment"># 将 Pandas 行为恢复为默认使用.reset_option().</span></span><br><span class="line">pd.reset_option(<span class="string">&#x27;display.float_format&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="to-numeric-转换数据类型"><a href="#to-numeric-转换数据类型" class="headerlink" title="to_numeric 转换数据类型"></a><a target="_blank" rel="noopener" href="https://pandas.pydata.org/docs/reference/api/pandas.to_numeric.html">to_numeric</a> 转换数据类型</h3><ul>
+<li>能够对字符格式的数值进行快速转换和筛选。主要参数包括 :<ul>
+<li>errors - 非数值的处理模式： <code>ignore</code>, <code>raise</code>(default), <code>coerce</code>（保持原来的字符串，直接报错，设为缺失<code>Nan</code>）</li>
+<li>downcast - 转换类型：<code>integer</code>, <code>signed</code>, <code>unsigned</code>, <code>float</code>, default None。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">&#x27;col_name&#x27;</span>] = pd.to_numeric(df[<span class="string">&#x27;col_name&#x27;</span>], errors=<span class="string">&#x27;coerce&#x27;</span>, downcast=<span class="string">&#x27;integer&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="fillna-value-method-limit-缺失值填充"><a href="#fillna-value-method-limit-缺失值填充" class="headerlink" title="fillna(value, [method, limit]) 缺失值填充"></a>fillna(value, [method, limit]) 缺失值填充</h3><ul>
+<li>method：ffill/bfill 前面/后面的元素填充</li>
+<li>limit：int，连续缺失值的最大填充次数</li>
+</ul>
+<h3 id="any-返回任何元素是否为真-在轴上"><a href="#any-返回任何元素是否为真-在轴上" class="headerlink" title="any()返回任何元素是否为真(/在轴上)"></a>any()返回任何元素是否为真(/在轴上)</h3><ul>
+<li><strong>axis</strong> : {0 or ‘index’, 1 or ‘columns’, None}</li>
+<li><strong>bool_only</strong> : <code>bool</code>, 默认 <code>None</code></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Dai Sine</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://daisine.github.io/pandas/">https://daisine.github.io/pandas/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/pandas/">pandas</a></div><div class="post_share"><div class="social-share" data-image="/img/mai4.ico" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/tdl2022/"><img class="prev-cover" src="/img/mai7.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">22年的ToDoList-work related</div></div></a></div><div class="next-post pull-right"><a href="/pyqt/"><img class="next-cover" src="/img/mai9.ico" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">PyQt笔记</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Dai Sine</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">64</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/daisine" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:daisine@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Useful-link"><span class="toc-number">1.</span> <span class="toc-text">Useful link</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Dataframe"><span class="toc-number">2.</span> <span class="toc-text">Dataframe</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C"><span class="toc-number">2.1.</span> <span class="toc-text">基础操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8B%BC%E6%8E%A5-%E9%87%8D%E5%A4%8D%E5%88%97%E5%90%8D%E5%A4%84%E7%90%86suffixes"><span class="toc-number">2.2.</span> <span class="toc-text">拼接 (重复列名处理suffixes)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E7%BB%84"><span class="toc-number">2.3.</span> <span class="toc-text">分组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E5%88%97%E5%90%8D-%E7%B4%A2%E5%BC%95"><span class="toc-number">2.4.</span> <span class="toc-text">修改列名&#x2F;索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E6%8C%87%E5%AE%9A%E5%88%97%E4%B8%8E%E8%A1%8C"><span class="toc-number">2.5.</span> <span class="toc-text">读取指定列与行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0-%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AACol%E6%A0%87%E7%AD%BE%E4%B8%80%E6%A0%B7%E7%9A%84df"><span class="toc-number">2.6.</span> <span class="toc-text">添加&#x2F;合并两个Col标签一样的df</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Series"><span class="toc-number">3.</span> <span class="toc-text">Series</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%81%8D%E5%8E%86series%E4%B8%AD%E7%9A%84index%E4%B8%8E%E5%80%BC"><span class="toc-number">3.1.</span> <span class="toc-text">遍历series中的index与值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Series%E8%BD%AC%E7%BD%AE%E4%B8%BAdf"><span class="toc-number">3.2.</span> <span class="toc-text">Series转置为df</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Dataframe%E4%B8%8ESeries%E7%9A%84%E9%80%9A%E7%94%A8%E6%93%8D%E4%BD%9C"><span class="toc-number">4.</span> <span class="toc-text">Dataframe与Series的通用操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#df-to-excel-%E8%B0%83%E6%95%B4%E5%88%97%E5%AE%BD"><span class="toc-number">5.</span> <span class="toc-text">df.to_excel 调整列宽</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pd-ExcelWriter%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-number">5.1.</span> <span class="toc-text">pd.ExcelWriter的使用方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ExcelWriter%E8%B0%83%E6%95%B4Excel%E5%88%97%E5%AE%BD"><span class="toc-number">5.2.</span> <span class="toc-text">ExcelWriter调整Excel列宽</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pandas%E8%AF%BB%E5%8F%96%E8%BF%87%E5%A4%A7%E8%BF%87%E5%B0%8F%E6%95%B0%E5%AD%97%E7%9A%84%E6%95%B0%E6%8D%AE-%E7%A7%91%E5%AD%A6%E8%AE%A1%E6%95%B0%E6%B3%95%E7%9A%84%E5%A4%84%E7%90%86"><span class="toc-number">6.</span> <span class="toc-text">pandas读取过大过小数字的数据&#x2F;科学计数法的处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#to-numeric-%E8%BD%AC%E6%8D%A2%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-number">7.</span> <span class="toc-text">to_numeric 转换数据类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#fillna-value-method-limit-%E7%BC%BA%E5%A4%B1%E5%80%BC%E5%A1%AB%E5%85%85"><span class="toc-number">8.</span> <span class="toc-text">fillna(value, [method, limit]) 缺失值填充</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#any-%E8%BF%94%E5%9B%9E%E4%BB%BB%E4%BD%95%E5%85%83%E7%B4%A0%E6%98%AF%E5%90%A6%E4%B8%BA%E7%9C%9F-%E5%9C%A8%E8%BD%B4%E4%B8%8A"><span class="toc-number">9.</span> <span class="toc-text">any()返回任何元素是否为真(&#x2F;在轴上)</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/mysql/" title="软件设计编写中mysql related"><img src="/img/mai8.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="软件设计编写中mysql related"/></a><div class="content"><a class="title" href="/mysql/" title="软件设计编写中mysql related">软件设计编写中mysql related</a><time datetime="2022-08-15T07:31:21.000Z" title="Created 2022-08-15 15:31:21">2022-08-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-ide/" title="QtCreator/VS2015/Clion配置"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="QtCreator/VS2015/Clion配置"/></a><div class="content"><a class="title" href="/qt-ide/" title="QtCreator/VS2015/Clion配置">QtCreator/VS2015/Clion配置</a><time datetime="2022-07-08T08:32:22.000Z" title="Created 2022-07-08 16:32:22">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-class/" title="Qt开发笔记"><img src="/img/mai4.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt开发笔记"/></a><div class="content"><a class="title" href="/qt-class/" title="Qt开发笔记">Qt开发笔记</a><time datetime="2022-07-08T01:45:12.000Z" title="Created 2022-07-08 09:45:12">2022-07-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/mac-ntfs/" title="Mac 读写ntfs U盘"><img src="/img/mai5.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Mac 读写ntfs U盘"/></a><div class="content"><a class="title" href="/mac-ntfs/" title="Mac 读写ntfs U盘">Mac 读写ntfs U盘</a><time datetime="2022-07-05T08:20:28.000Z" title="Created 2022-07-05 16:20:28">2022-07-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/qt-msvc-clion/qt-msvc-clion/" title="No title"><img src="/img/mai7.ico" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="No title"/></a><div class="content"><a class="title" href="/qt-msvc-clion/qt-msvc-clion/" title="No title">No title</a><time datetime="2022-06-21T07:20:07.233Z" title="Created 2022-06-21 15:20:07">2022-06-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2017 - 2023 By Dai Sine</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
